@@ -16,6 +16,10 @@ public class Database {
         }
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     public Account getAccount(String login, int pin) {
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM accounts WHERE login = ? AND pin = ?");

@@ -1,6 +1,6 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Account {
     private int accountNumber;
@@ -56,5 +56,13 @@ public class Account {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void printTransaction(String type, double amount) {
+        String date = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+        System.out.println("\nAccount #" + accountNumber);
+        System.out.println("Date: " + date);
+        System.out.println(type + ": " + amount);
+        System.out.println("Balance: " + balance + "\n");
     }
 }
