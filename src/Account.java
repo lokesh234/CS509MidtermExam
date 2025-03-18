@@ -1,3 +1,7 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 public class Account {
     private int accountNumber;
     private String holderName;
@@ -23,21 +27,34 @@ public class Account {
         System.out.println("Balance: " + balance);
     }
 
-    public void deposit(double amount) {
+    public void deposit(double amount, Connection connection) {
         if (amount > 0) {
             balance += amount;
+            updateBalance(connection);
             System.out.println("Cash Deposited Successfully. New Balance: " + balance);
         } else {
             System.out.println("Invalid deposit amount.");
         }
     }
 
-    public void withdraw(double amount) {
+    public void withdraw(double amount, Connection connection) {
         if (amount > 0 && amount <= balance) {
             balance -= amount;
+            updateBalance(connection);
             System.out.println("Cash Withdrawn Successfully. New Balance: " + balance);
         } else {
             System.out.println("Invalid withdrawal amount or insufficient funds.");
+        }
+    }
+
+    private void updateBalance(Connection connection) {
+        try {
+            PreparedStatement stmt = connection.prepareStatement("UPDATE accounts SET balance = ? WHERE accountNumber = ?");
+            stmt.setDouble(1, balance);
+            stmt.setInt(2, accountNumber);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
