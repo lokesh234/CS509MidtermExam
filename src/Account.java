@@ -22,4 +22,22 @@ public class Account {
     public void displayBalance() {
         System.out.println("Balance: " + balance);
     }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Cash Deposited Successfully. New Balance: " + balance);
+        } else {
+            System.out.println("Invalid deposit amount.");
+        }
+    }
+
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println("Cash Withdrawn Successfully. New Balance: " + balance);
+        } else {
+            System.out.println("Invalid withdrawal amount or insufficient funds.");
+        }
+    }
 }
