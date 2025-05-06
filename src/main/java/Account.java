@@ -1,7 +1,3 @@
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Account {
     private int accountNumber;
     private String holderName;
@@ -19,50 +15,39 @@ public class Account {
         this.pin = pin;
     }
 
-    public boolean authenticate(String login, int pin) {
-        return this.login.equals(login) && this.pin == pin;
+    public int getAccountNumber() {
+        return accountNumber;
     }
 
-    public void displayBalance() {
-        System.out.println("Balance: " + balance);
+    public String getHolderName() {
+        return holderName;
     }
 
-    public void deposit(double amount, Connection connection) {
-        if (amount > 0) {
-            balance += amount;
-            updateBalance(connection);
-            System.out.println("Cash Deposited Successfully. New Balance: " + balance);
-        } else {
-            System.out.println("Invalid deposit amount.");
-        }
+    public double getBalance() {
+        return balance;
     }
 
-    public void withdraw(double amount, Connection connection) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount;
-            updateBalance(connection);
-            System.out.println("Cash Withdrawn Successfully. New Balance: " + balance);
-        } else {
-            System.out.println("Invalid withdrawal amount or insufficient funds.");
-        }
+    public String getStatus() {
+        return status;
     }
 
-    private void updateBalance(Connection connection) {
-        try {
-            PreparedStatement stmt = connection.prepareStatement("UPDATE accounts SET balance = ? WHERE accountNumber = ?");
-            stmt.setDouble(1, balance);
-            stmt.setInt(2, accountNumber);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public String getLogin() {
+        return login;
     }
 
-    private void printTransaction(String type, double amount) {
-        String date = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
-        System.out.println("\nAccount #" + accountNumber);
-        System.out.println("Date: " + date);
-        System.out.println(type + ": " + amount);
-        System.out.println("Balance: " + balance + "\n");
+    public int getPin() {
+        return pin;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public void setHolderName(String holderName) {
+        this.holderName = holderName;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -4,7 +4,6 @@ public class MainATM {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Database db = new Database();
-        Admin admin = new Admin(db.getConnection());
 
         System.out.print("Enter login: ");
         String login = scanner.next();
@@ -13,6 +12,7 @@ public class MainATM {
         scanner.nextLine();
 
         if (login.equals("admin") && pin == 0000) {
+            AdminService adminService = new AdminService(new AdminRepository(db.getConnection()));
             boolean exit = false;
             while (!exit) {
                 System.out.println("1----Create New Account\n2----Delete Existing Account\n3----Update Account Information\n4----Search for Account\n6----Exit");
@@ -33,12 +33,12 @@ public class MainATM {
                         String newLogin = scanner.nextLine();
                         System.out.print("Enter PIN: ");
                         int newPin = scanner.nextInt();
-                        admin.createAccount(name, balance, status, newLogin, newPin);
+                        adminService.createAccount(name, balance, status, newLogin, newPin);
                         break;
                     case 2:
                         System.out.print("Enter Account Number to Delete: ");
                         int accNum = scanner.nextInt();
-                        admin.deleteAccount(accNum);
+                        adminService.deleteAccount(accNum);
                         break;
                     case 3:
                         System.out.print("Enter Account Number to Update: ");
@@ -48,12 +48,12 @@ public class MainATM {
                         String newHolderName = scanner.nextLine();
                         System.out.print("Enter New Status (Active/Inactive): ");
                         String newStatus = scanner.nextLine();
-                        admin.updateAccount(updateAcc, newHolderName, newStatus);
+                        adminService.updateAccount(updateAcc, newHolderName, newStatus);
                         break;
                     case 4:
                         System.out.print("Enter Account Number to Search: ");
                         int searchAcc = scanner.nextInt();
-                        admin.searchAccount(searchAcc);
+                        adminService.searchAccount(searchAcc);
                         break;
                     case 6:
                         exit = true;
@@ -63,37 +63,43 @@ public class MainATM {
                 }
             }
         } else {
-            Account user = db.getAccount(login, pin);
-            if (user != null) {
-                boolean exit = false;
-                while (!exit) {
-                    System.out.println("1----Withdraw Cash\n3----Deposit Cash\n4----Display Balance\n5----Exit");
-                    System.out.print("Choose an option: ");
-                    int choice = scanner.nextInt();
+            AccountRepository accountRepo = new AccountRepository(db.getConnection());
+            try {
+                Account account = accountRepo.getAccountByLogin(login, pin);
+                if (account != null) {
+                    AccountService accountService = new AccountService(account, accountRepo);
+                    boolean exit = false;
+                    while (!exit) {
+                        System.out.println("1----Withdraw Cash\n3----Deposit Cash\n4----Display Balance\n5----Exit");
+                        System.out.print("Choose an option: ");
+                        int choice = scanner.nextInt();
 
-                    switch (choice) {
-                        case 1:
-                            System.out.print("Enter withdrawal amount: ");
-                            double withdrawAmount = scanner.nextDouble();
-                            user.withdraw(withdrawAmount, db.getConnection());
-                            break;
-                        case 3:
-                            System.out.print("Enter the cash amount to deposit: ");
-                            double depositAmount = scanner.nextDouble();
-                            user.deposit(depositAmount, db.getConnection());
-                            break;
-                        case 4:
-                            user.displayBalance();
-                            break;
-                        case 5:
-                            exit = true;
-                            break;
-                        default:
-                            System.out.println("Invalid choice. Try again.");
+                        switch (choice) {
+                            case 1:
+                                System.out.print("Enter withdrawal amount: ");
+                                double withdrawAmount = scanner.nextDouble();
+                                accountService.withdraw(withdrawAmount);
+                                break;
+                            case 3:
+                                System.out.print("Enter the cash amount to deposit: ");
+                                double depositAmount = scanner.nextDouble();
+                                accountService.deposit(depositAmount);
+                                break;
+                            case 4:
+                                accountService.displayBalance();
+                                break;
+                            case 5:
+                                exit = true;
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Try again.");
+                        }
                     }
+                } else {
+                    System.out.println("Invalid Credentials");
                 }
-            } else {
-                System.out.println("Invalid Credentials");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
             }
         }
 
